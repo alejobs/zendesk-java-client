@@ -36,6 +36,7 @@ public class Ticket extends Request implements SearchResultEntity {
     private Long ticketFormId;
     private Long brandId;
     private Boolean isPublic;
+    private Metric metric;
 
     public Ticket() {
     }
@@ -246,6 +247,15 @@ public class Ticket extends Request implements SearchResultEntity {
 
     public void setIsPublic(Boolean isPublic) {
         this.isPublic = isPublic;
+    }
+
+    @JsonProperty("metric_set")
+    public Metric getMetric() {
+        return metric;
+    }
+
+    public void setMetric(Metric metric) {
+        this.metric = metric;
     }
 
     @Override

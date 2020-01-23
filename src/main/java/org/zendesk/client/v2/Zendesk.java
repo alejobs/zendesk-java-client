@@ -80,7 +80,7 @@ public class Zendesk implements Closeable {
         this.logger = LoggerFactory.getLogger(Zendesk.class);
         this.closeClient = client == null;
         this.oauthToken = null;
-        this.client = client == null ? new DefaultAsyncHttpClient(new DefaultAsyncHttpClientConfig.Builder().setConnectTimeout(6000).build()) : client;
+        this.client = client == null ? new DefaultAsyncHttpClient() : client;
         this.url = url.endsWith("/") ? url + "api/v2" : url + "/api/v2";
         if (username != null) {
             this.realm = new Realm.Builder(username, password)

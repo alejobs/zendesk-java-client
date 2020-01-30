@@ -1,10 +1,13 @@
 package org.zendesk.client.v2.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author stephenc
@@ -36,7 +39,12 @@ public class Ticket extends Request implements SearchResultEntity {
     private Long ticketFormId;
     private Long brandId;
     private Boolean isPublic;
+    @JsonIgnore
     private Metric metric;
+    @JsonIgnore
+    private String submitterName;
+    @JsonIgnore
+    private String assigneeName;
 
     public Ticket() {
     }
@@ -249,13 +257,36 @@ public class Ticket extends Request implements SearchResultEntity {
         this.isPublic = isPublic;
     }
 
-    @JsonProperty("metric_set")
     public Metric getMetric() {
         return metric;
     }
 
     public void setMetric(Metric metric) {
         this.metric = metric;
+    }
+
+    public String getSubmitterName() {
+        return submitterName;
+    }
+
+    public void setSubmitterName(String submitterName) {
+        this.submitterName = submitterName;
+    }
+
+    public String getAssigneeName() {
+        return assigneeName;
+    }
+
+    public void setAssigneeName(String assigneeName) {
+        this.assigneeName = assigneeName;
+    }
+
+    public String getCustomFieldValue(String name) {
+        return this.getCustomFields().stream()
+                .filter(customFieldValue -> customFieldValue.getName().equals(name))
+                .map(customFieldValue -> customFieldValue.getValue())
+                .flatMap(values -> Stream.of(values))
+                .collect(Collectors.joining(","));
     }
 
     @Override

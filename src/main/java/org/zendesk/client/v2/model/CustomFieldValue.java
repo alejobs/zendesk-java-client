@@ -1,6 +1,7 @@
 package org.zendesk.client.v2.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
@@ -16,6 +17,9 @@ public class CustomFieldValue implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
+
+    @JsonIgnore
+    private String name;
 
     @JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY,
             JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
@@ -43,6 +47,14 @@ public class CustomFieldValue implements Serializable {
 
     public void setValue(String[] value) {
         this.value = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

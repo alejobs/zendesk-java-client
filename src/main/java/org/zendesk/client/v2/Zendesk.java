@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -2850,27 +2851,27 @@ public class Zendesk implements Closeable {
                     if (nextPage == null || nextPage.equalsIgnoreCase("null")) {
                         return false;
                     }
-                    List<T> values = complete(submit(req("GET", nextPage), handler));
-                    nextPage = getNextPage();
+                    List<T> values = getValues();
+                    nextPage = handler.getNextPage();
                     current = values.iterator();
                 }
                 return current.hasNext();
             }
 
-            public String getNextPage() {
+            public List<T> getValues() {
                 try {
-                    return handler.getNextPage();
+                    return complete(submit(req("GET", nextPage), handler));
                 } catch(ZendeskResponseRateLimitException e) {
-                    if(isIncremental) {
+                    //if(isIncremental) {
                         try {
                             Thread.sleep(e.getRetryAfter() * 1000);
-                            return getNextPage();
+                            return getValues();
                         } catch (InterruptedException ex) {
                             logger.error("Error sleeping thread for retrying incremental export. Error: " + e.getMessage());
                             throw e;
                         }
-                    }
-                    throw e;
+                    //}
+                    //throw e;
                 }
             }
 
@@ -2965,9 +2966,9 @@ public class Zendesk implements Closeable {
     public class SideLoadingHandler<T,U> {
         private final Class<U> secondaryClazz;
         private final String name;
-        private final SideLoadingMerger<T,U> merger;
+        private final SideLoadingMerger<T, U> merger;
 
-        public SideLoadingHandler(Class<U> secondaryClazz, String name, SideLoadingMerger<T,U> merger) {
+        public SideLoadingHandler(Class<U> secondaryClazz, String name, SideLoadingMerger<T, U> merger) {
             this.secondaryClazz = secondaryClazz;
             this.name = name;
             this.merger = merger;
@@ -2989,5 +2990,26 @@ public class Zendesk implements Closeable {
     @FunctionalInterface
     public interface SideLoadingMerger<T,U> {
         abstract List<T> merge(List<T> main, List<U> secondary);
+    }
+
+    public SideLoadingMerger<Ticket,User> handleTicketsAndUsers() {
+        return (tickets, users) -> {
+            final Map<Long,User> usersById = users.stream().collect(Collectors.toMap(User::getId, Function.identity()));
+            tickets.forEach(ticket -> {
+                ticket.setAssigneeName(ticket.getAssigneeId()!=null ? usersById.get(ticket.getAssigneeId()).getName() : null);
+                ticket.setSubmitterName(usersById.get(ticket.getSubmitterId()).getName());
+            });
+            return tickets;
+        };
+    }
+
+    public SideLoadingMerger<Ticket,Metric> handleTicketsAndMetrics() {
+        return (tickets, metric_sets) -> {
+            final Map<Long, Metric> metricsByTicketId = metric_sets.stream().collect(Collectors.toMap(Metric::getTicketId, Function.identity()));
+            tickets.forEach(ticket -> {
+                ticket.setMetric(metricsByTicketId.get(ticket.getId()));
+            });
+            return tickets;
+        };
     }
 }

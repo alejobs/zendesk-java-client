@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -285,6 +286,7 @@ public class Ticket extends Request implements SearchResultEntity {
         return this.getCustomFields().stream()
                 .filter(customFieldValue -> customFieldValue.getName().equals(name))
                 .map(customFieldValue -> customFieldValue.getValue())
+                .filter(Objects::nonNull)
                 .flatMap(values -> Stream.of(values))
                 .collect(Collectors.joining(","));
     }

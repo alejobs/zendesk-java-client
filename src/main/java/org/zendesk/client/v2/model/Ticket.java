@@ -46,6 +46,8 @@ public class Ticket extends Request implements SearchResultEntity {
     private String submitterName;
     @JsonIgnore
     private String assigneeName;
+    @JsonIgnore
+    private String submitterLocale;
 
     public Ticket() {
     }
@@ -280,6 +282,23 @@ public class Ticket extends Request implements SearchResultEntity {
 
     public void setAssigneeName(String assigneeName) {
         this.assigneeName = assigneeName;
+    }
+
+    public String getSubmitterLocale() {
+        return submitterLocale;
+    }
+
+    public void setSubmitterLocale(String submitterLocale) {
+        this.submitterLocale = submitterLocale;
+    }
+
+    public String getCustomFieldValue(Long id) {
+        return this.getCustomFields().stream()
+                .filter(customFieldValue -> customFieldValue.getId().equals(id))
+                .map(customFieldValue -> customFieldValue.getValue())
+                .filter(Objects::nonNull)
+                .flatMap(values -> Stream.of(values))
+                .collect(Collectors.joining(","));
     }
 
     public String getCustomFieldValue(String name) {

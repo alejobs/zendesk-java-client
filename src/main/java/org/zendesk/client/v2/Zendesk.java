@@ -2997,6 +2997,7 @@ public class Zendesk implements Closeable {
             final Map<Long,User> usersById = users.stream().collect(Collectors.toMap(User::getId, Function.identity()));
             tickets.forEach(ticket -> {
                 ticket.setAssigneeName(ticket.getAssigneeId()!=null ? usersById.get(ticket.getAssigneeId()).getName() : null);
+                ticket.setSubmitterLocale(ticket.getSubmitterId()!=null ? usersById.get(ticket.getSubmitterId()).getLocale() : null);
                 ticket.setSubmitterName(usersById.get(ticket.getSubmitterId()).getName());
             });
             return tickets;

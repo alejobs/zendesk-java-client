@@ -19,7 +19,9 @@ public class Macro implements Serializable {
 
     private long id;
     private String title;
+    private String description;
     private boolean active;
+    private MacroRestriction macroRestriction;
     private List<Action> actions;
     private Date createdAt;
     private Date updatedAt;
@@ -42,12 +44,29 @@ public class Macro implements Serializable {
         this.title = title;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public boolean getActive() {
         return active;
     }
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    @JsonProperty("restriction")
+    public MacroRestriction getMacroRestriction() {
+        return macroRestriction;
+    }
+
+    public void setMacroRestriction(MacroRestriction macroRestriction) {
+        this.macroRestriction = macroRestriction;
     }
 
     public List<Action> getActions() {
@@ -85,5 +104,26 @@ public class Macro implements Serializable {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
+    }
+
+    public class MacroRestriction {
+        private String type;
+        private long id;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
     }
 }
